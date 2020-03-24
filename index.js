@@ -19,15 +19,16 @@ Class private methods
  */
 
 const self = {
+	root: insta,
 	get: (path, tryParse = true, sessionID = this.sessionID, params) => new Promise((resolve, reject) => {
-		const url = insta + path + '/?' + querystring({ ...(sessionID ? { __a: 1 } : {}), ...params });
+		const url = self.root + path + '/?' + querystring({ ...(sessionID ? { __a: 1 } : {}), ...params });
 		request(url, {
 			headers: {
 				cookie: sessionID ? `sessionid=${sessionID}` : ''
 			},
 			followAllRedirects: true
 		}, (err, res, body) => {
-			if(res.request.uri.href.startsWith(insta + 'accounts/login')){
+			if(res.request.uri.href.startsWith(self.root + 'accounts/login')){
 				reject(401);
 			}
 			else if(res.statusCode !== 200){
@@ -411,5 +412,9 @@ module.exports = class Insta {
 				active = false;
 			}
 		};
+	}
+	setRoot(root = insta){
+		if(!root.endsWith('/')) root += '/';
+		self.root = root;
 	}
 };
